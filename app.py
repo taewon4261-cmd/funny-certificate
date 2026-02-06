@@ -6,9 +6,9 @@ import io
 # [설정 영역]
 # ==========================================
 # 1. 위치 좌표
-NAME_X, NAME_Y = 160, 350
-TITLE_X, TITLE_Y = 160, 450
-DESC_X, DESC_Y = 160, 525
+NAME_X, NAME_Y = 150, 280
+TITLE_X, TITLE_Y = 150, 400
+DESC_X, DESC_Y = 150, 525
 
 # 2. [중요] 가로 한계선 (이 넓이를 넘어가면 제목은 작아지고, 내용은 줄바꿈됨)
 MAX_WIDTH = 450 
@@ -21,10 +21,10 @@ STAMP_TEXT_X_OFFSET = 250   # 도장 텍스트 위치 미세조정 필요시 변
 STAMP_TEXT_Y_OFFSET = 65
 
 # 4. 기본 글자 크기
-FONT_SIZE_NAME = 50
-FONT_SIZE_TITLE_DEFAULT = 45 # 제목 기본 크기 (여기서부터 줄어듦)
-FONT_SIZE_DESC = 25
-FONT_SIZE_FOOTER = 30
+FONT_SIZE_NAME = 55
+FONT_SIZE_TITLE_DEFAULT = 50 # 제목 기본 크기 (여기서부터 줄어듦)
+FONT_SIZE_DESC = 30
+FONT_SIZE_FOOTER = 40
 FONT_SIZE_STAMP = 45
 
 # 5. 폰트 파일 경로 (같은 폴더에 있어야 함)
