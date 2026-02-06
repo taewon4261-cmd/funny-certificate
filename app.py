@@ -6,9 +6,9 @@ import io
 # [설정 영역]
 # ==========================================
 # 1. 위치 좌표
-NAME_X, NAME_Y = 180, 350
-TITLE_X, TITLE_Y = 180, 450
-DESC_X, DESC_Y = 180, 525
+NAME_X, NAME_Y = 160, 350
+TITLE_X, TITLE_Y = 160, 450
+DESC_X, DESC_Y = 160, 525
 
 # 2. [중요] 가로 한계선 (이 넓이를 넘어가면 제목은 작아지고, 내용은 줄바꿈됨)
 MAX_WIDTH = 450 
