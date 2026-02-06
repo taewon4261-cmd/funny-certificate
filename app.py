@@ -3,34 +3,36 @@ from PIL import Image, ImageDraw, ImageFont
 import io
 
 # ==========================================
-# [설정 영역] 태권님이 맞춘 좌표 적용 완료!
+# [설정 영역]
 # ==========================================
-# 1. 상장 본문 글자 위치
-NAME_X, NAME_Y = 180, 350         # 이름
-TITLE_X, TITLE_Y = 180, 450       # 자격증 명
-DESC_X, DESC_Y = 180, 600         # 상세 내용
+# 1. 위치 좌표
+NAME_X, NAME_Y = 180, 350
+TITLE_X, TITLE_Y = 180, 450
+DESC_X, DESC_Y = 180, 525
 
-# 2. [중요] 하단 문구 (왼쪽 검은 글씨) 위치
-FOOTER_X, FOOTER_Y = 200, 800     # 검은 글씨 위치
+# 2. [중요] 가로 한계선 (이 넓이를 넘어가면 제목은 작아지고, 내용은 줄바꿈됨)
+MAX_WIDTH = 450 
 
-# 3. [중요] 도장 위치 (오른쪽 빨간 도장 그림)
-STAMP_X, STAMP_Y = 400, 650       # 도장 그림 위치
-STAMP_SIZE = (250, 250)           # 도장 크기 (키움)
+# 3. 하단 문구 및 도장
+FOOTER_X, FOOTER_Y = 200, 800
+STAMP_X, STAMP_Y = 400, 650
+STAMP_SIZE = (250, 250)
+STAMP_TEXT_X_OFFSET = 250   # 도장 텍스트 위치 미세조정 필요시 변경
+STAMP_TEXT_Y_OFFSET = 65
 
-# 4. [신규 기능] 도장 '내부 글씨' 위치 미세 조정
-STAMP_TEXT_X_OFFSET = 250         # 가로 위치 조절 (오른쪽으로 많이 이동)
-STAMP_TEXT_Y_OFFSET = 65          # 세로 위치 조절 (아래로 이동)
-
-# 5. 글자 크기
+# 4. 기본 글자 크기
 FONT_SIZE_NAME = 50
-FONT_SIZE_TITLE = 40
+FONT_SIZE_TITLE_DEFAULT = 45 # 제목 기본 크기 (여기서부터 줄어듦)
 FONT_SIZE_DESC = 25
 FONT_SIZE_FOOTER = 30
-FONT_SIZE_STAMP = 45              # 도장 글씨 크기 (키움)
+FONT_SIZE_STAMP = 45
+
+# 5. 폰트 파일 경로 (같은 폴더에 있어야 함)
+FONT_PATH = "font.ttf" 
 
 # 6. 색상
 TEXT_COLOR = (0, 0, 0)
-STAMP_COLOR = (230, 0, 0, 220)    # 빨간색
+STAMP_COLOR = (230, 0, 0, 220)
 # ==========================================
 
 # 📜 [데이터베이스]
@@ -72,104 +74,161 @@ CERT_DB = {
     }
 }
 
-st.title("🎖️ 대국민 쓸데없는 자격증 발급소 (Final)")
+
+# --- 🛠️ [기능 1] 설명 부분 자동 줄바꿈 함수 ---
+def wrap_text(text, font, max_width, draw):
+    lines = []
+    # 사용자가 입력한 강제 줄바꿈(\n)은 먼저 유지
+    paragraphs = text.split('\n')
+    
+    for paragraph in paragraphs:
+        current_line = []
+        for char in paragraph:
+            current_line.append(char)
+            # 현재까지의 길이 측정
+            test_line = "".join(current_line)
+            bbox = draw.textbbox((0, 0), test_line, font=font)
+            width = bbox[2] - bbox[0]
+            
+            if width > max_width:
+                # 넘치면 마지막 글자 빼고 줄바꿈 처리
+                current_line.pop()
+                lines.append("".join(current_line))
+                current_line = [char] # 뺀 글자는 다음 줄 첫 글자로
+        
+        # 남은 글자들 추가
+        if current_line:
+            lines.append("".join(current_line))
+            
+    return "\n".join(lines)
+
+# --- 🛠️ [기능 2] 글자 크기 자동 축소 함수 (제목 & 이름 공용) ---
+def get_fitted_title_font(text, max_width, draw, font_path, start_size, min_size=20):
+    current_size = start_size
+    
+    # 폰트 파일이 없으면 기본 폰트 반환 (축소 불가)
+    try:
+        font = ImageFont.truetype(font_path, current_size)
+    except:
+        return ImageFont.load_default()
+
+    while current_size > min_size:
+        font = ImageFont.truetype(font_path, current_size)
+        bbox = draw.textbbox((0, 0), text, font=font)
+        text_width = bbox[2] - bbox[0]
+        
+        if text_width <= max_width:
+            return font # 범위 안에 들어오면 이 폰트 반환
+        
+        current_size -= 2 # 2픽셀씩 줄임
+        
+    return ImageFont.truetype(font_path, min_size) # 최소 사이즈 반환
+
+
+# ==========================================
+# [메인 화면 구성]
+# ==========================================
+st.title("🎖️ 대국민 쓸데없는 자격증 발급소")
 
 # --- 사이드바 ---
 st.sidebar.header("정보 입력")
 
-user_name = st.sidebar.text_input("이름", value="이름")
+user_name = st.sidebar.text_input("이름", value="홍길동")
 selected_cert = st.sidebar.selectbox("자격증 종류 선택", list(CERT_DB.keys()))
 
 if selected_cert == "직접 입력":
-    cert_title = st.sidebar.text_input("자격증 이름", value="코딩 천재 1급")
-    cert_desc = st.sidebar.text_area("내용", value="그냥 천재임.")
+    cert_title_input = st.sidebar.text_input("자격증 이름", value="코딩 천재 1급")
+    cert_desc_input = st.sidebar.text_area("내용 (길면 자동 줄바꿈 됨)", value="이 사람은 코딩을 너무 잘해서...")
     footer_text = st.sidebar.text_input("하단 문구", value="코딩 협회장")
-    stamp_text_input = st.sidebar.text_input("도장 문구 (띄어쓰기로 줄바꿈)", value="최고 존엄")
+    stamp_text_input = st.sidebar.text_input("도장 문구", value="참 잘했어요")
 else:
-    cert_title = selected_cert
-    cert_desc = CERT_DB[selected_cert]["desc"]
+    cert_title_input = selected_cert
+    cert_desc_input = CERT_DB[selected_cert]["desc"]
     footer_text = CERT_DB[selected_cert]["footer"]
     stamp_text_input = CERT_DB[selected_cert]["stamp_text"]
-    st.sidebar.info(f"💡 내용 미리보기:\n{cert_desc}")
+    st.sidebar.info(f"내용: {cert_desc_input}")
 
-# --- 배너 (100원 후원 유도) ---
+# --- 배너 ---
 st.sidebar.markdown("---")
 st.sidebar.header("☕ 개발자에게 믹스커피 사주기")
-
-# 1. 멘트 수정 (부담 없이 100원만!)
 st.sidebar.markdown("""
 재밌게 즐기셨나요?  
-**'100원'**만 후원해주시면  
+**딱 '100원'**만 후원해주시면  
 서버 유지비에 큰 힘이 됩니다! 🙇‍♂️  
-(100원의 기적을 보여주세요!)
 """)
-
-# 2. 계좌번호 복사 버튼
-st.sidebar.code("1000-4564-3898", language="text") # 본인 계좌
+st.sidebar.code("1000-4564-3898", language="text")
 st.sidebar.caption("토스/카뱅에서 복사해서 보내주세요!")
+
 # --- 메인 로직 ---
 if st.button("자격증 발급하기 🖨️"):
     try:
-        bg_image = Image.open("certificate_bg.png")
+        # 배경 이미지 로드
+        bg_image = Image.open("certificate_bg.png") # 배경 파일명 확인!
         draw = ImageDraw.Draw(bg_image)
         
-        # 폰트 로드
+        # 폰트 로드 (기본 폰트 설정)
         try:
-            font_name = ImageFont.truetype("font.ttf", FONT_SIZE_NAME)
-            font_title = ImageFont.truetype("font.ttf", FONT_SIZE_TITLE)
-            font_desc = ImageFont.truetype("font.ttf", FONT_SIZE_DESC)
-            font_footer = ImageFont.truetype("font.ttf", FONT_SIZE_FOOTER)
-            font_stamp = ImageFont.truetype("font.ttf", FONT_SIZE_STAMP)
+            # 이름 폰트와 제목 폰트는 아래에서 동적으로 다시 로드하므로 여기선 기본값만 설정
+            font_desc = ImageFont.truetype(FONT_PATH, FONT_SIZE_DESC)
+            font_footer = ImageFont.truetype(FONT_PATH, FONT_SIZE_FOOTER)
+            font_stamp = ImageFont.truetype(FONT_PATH, FONT_SIZE_STAMP)
         except:
-            st.error("🚨 'font.ttf' 필요! 기본 폰트로 나옵니다.")
-            font_name = ImageFont.load_default()
-            font_title = ImageFont.load_default()
+            st.error(f"🚨 '{FONT_PATH}' 폰트 파일이 없습니다! 기본 폰트로 실행됩니다.")
             font_desc = ImageFont.load_default()
             font_footer = ImageFont.load_default()
             font_stamp = ImageFont.load_default()
 
-        # 1. 상장 글씨 쓰기
-        draw.text((NAME_X, NAME_Y), f"성 명 : {user_name}", fill=TEXT_COLOR, font=font_name)
-        draw.text((TITLE_X, TITLE_Y), f"자 격 : {cert_title}", fill=TEXT_COLOR, font=font_title)
-        draw.text((DESC_X, DESC_Y), cert_desc, fill=TEXT_COLOR, font=font_desc, spacing=15)
+        # 1. [수정됨] 이름 쓰기 (글자 수에 맞춰 폰트 크기 자동 조절)
+        full_name = f"성 명 : {user_name}"
+        # 이름도 제목과 같은 함수를 사용하여 크기 조절 (기본 크기 FONT_SIZE_NAME=50 부터 시작)
+        fitted_name_font = get_fitted_title_font(full_name, MAX_WIDTH, draw, FONT_PATH, FONT_SIZE_NAME)
+        draw.text((NAME_X, NAME_Y), full_name, fill=TEXT_COLOR, font=fitted_name_font)
         
-        # 하단 문구 (독립 위치)
+        # 2. [기존 유지] 제목 쓰기 (글자 수에 맞춰 폰트 크기 자동 조절)
+        full_title = f"자 격 : {cert_title_input}"
+        fitted_title_font = get_fitted_title_font(full_title, MAX_WIDTH, draw, FONT_PATH, FONT_SIZE_TITLE_DEFAULT)
+        draw.text((TITLE_X, TITLE_Y), full_title, fill=TEXT_COLOR, font=fitted_title_font)
+        
+        # 3. [기존 유지] 본문 쓰기 (칸 넘어가면 자동 줄바꿈)
+        wrapped_desc = wrap_text(cert_desc_input, font_desc, MAX_WIDTH, draw)
+        draw.text((DESC_X, DESC_Y), wrapped_desc, fill=TEXT_COLOR, font=font_desc, spacing=15)
+        
+        # 4. 하단 문구
         draw.text((FOOTER_X, FOOTER_Y), footer_text, fill=TEXT_COLOR, font=font_footer)
 
-        # 2. 도장 만들기 (미세 조정 적용)
+        # 5. 도장 찍기
         try:
-            stamp_image = Image.open("stamp_frame.png").convert("RGBA")
+            stamp_image = Image.open("stamp_frame.png").convert("RGBA") # 도장 틀 이미지
             stamp_draw = ImageDraw.Draw(stamp_image)
             
-            # (1) 띄어쓰기를 줄바꿈으로 변경
+            # 도장 텍스트 (줄바꿈 처리)
             final_stamp_text = stamp_text_input.replace(" ", "\n")
             
-            # (2) 글자 중앙 정렬 계산
+            # 도장 중앙 정렬
             stamp_w, stamp_h = stamp_image.size
             left, top, right, bottom = stamp_draw.multiline_textbbox((0, 0), final_stamp_text, font=font_stamp, spacing=10, align='center')
             text_w = right - left
             text_h = bottom - top
             
-            # (3) 기본 중앙 위치 + 사용자 미세 조정값(OFFSET) 더하기
             text_x = (stamp_w - text_w) / 2 + STAMP_TEXT_X_OFFSET
             text_y = (stamp_h - text_h) / 2 + STAMP_TEXT_Y_OFFSET
 
-            # (4) 글씨 쓰기
             stamp_draw.multiline_text((text_x, text_y), final_stamp_text, fill=STAMP_COLOR, font=font_stamp, spacing=10, align='center')
             
-            # 완성된 도장 합성
+            # 배경에 도장 합성
             stamp_image = stamp_image.resize(STAMP_SIZE)
             bg_image.paste(stamp_image, (STAMP_X, STAMP_Y), stamp_image)
             
         except Exception as e:
-             st.warning(f"👉 'stamp_frame.png' 오류: {e}")
+             st.warning(f"도장 이미지 오류: {e}")
 
         # 결과 출력 및 다운로드
-        st.image(bg_image, caption="최종 완성!", use_column_width=True)
+        st.image(bg_image, caption="완성된 자격증", use_column_width=True)
+        
         buf = io.BytesIO()
         bg_image.save(buf, format="PNG")
-        st.download_button("이미지 저장 📥", buf.getvalue(), f"{user_name}_{cert_title}.png", "image/png")
+        st.download_button("이미지 저장 📥", buf.getvalue(), f"{user_name}_자격증.png", "image/png")
         
     except Exception as e:
         st.error(f"오류 발생: {e}")
-        st.warning("'certificate_bg.png'와 'font.ttf' 파일을 확인해주세요!")
+        st.info("폴더에 'certificate_bg.png', 'stamp_frame.png', 'font.ttf' 파일이 있는지 확인해주세요.")
