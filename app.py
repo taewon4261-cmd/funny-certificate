@@ -15,7 +15,7 @@ st.set_page_config(
 
 # 🅰️ 폰트 파일 설정 (파일 2개를 씁니다!)
 # 1. 본문용 폰트 (기존 파일)
-FONT_PATH_MAIN = "font.ttf"
+FONT_PATH_MAIN = "gungseo.ttc"
 # 2. 제목용 궁서체 폰트 (새로 업로드 하세요!)
 FONT_PATH_TITLE = "gungseo.ttc" 
 
