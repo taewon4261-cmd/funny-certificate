@@ -1,7 +1,7 @@
 import streamlit as st
 from PIL import Image, ImageDraw, ImageFont
 import io
-import pandas as pd # 데이터프레임 사용을 위해 추가
+import pandas as pd # 데이터 처리를 위해 필수
 
 # 페이지 기본 설정
 st.set_page_config(
@@ -15,9 +15,7 @@ st.set_page_config(
 # ==========================================
 
 # 🅰️ 폰트 파일 설정
-# 1. 본문용 폰트
 FONT_PATH_MAIN = "font.ttf" 
-# 2. 제목용 궁서체 폰트
 FONT_PATH_TITLE = "gungseo.ttc" 
 
 # 🅱️ 좌표 및 크기 설정
@@ -65,7 +63,6 @@ CERT_DB = {
 }
 
 # 💰 [후원자 데이터 관리]
-# Session State를 사용하여 앱이 실행되는 동안 데이터를 유지합니다.
 if 'donors' not in st.session_state:
     st.session_state.donors = [
         {"이름": "익명의 천사", "금액": 100},
@@ -74,7 +71,9 @@ if 'donors' not in st.session_state:
 
 # 총 모금액 계산 함수
 def get_total_donation():
-    return sum(item['금액'] for item in st.session_state.donors)
+    if not st.session_state.donors:
+        return 0
+    return sum(int(item['금액']) for item in st.session_state.donors)
 
 
 # --- 🛠️ 헬퍼 함수들 ---
@@ -152,7 +151,7 @@ with st.sidebar:
     st.markdown("---")
     
     # 🟢 개발자 노트북 사주기 (자동 합산 적용)
-    total_money = get_total_donation() # 현재 총액 계산
+    total_money = get_total_donation()
     
     st.header(" 티끌모아 노트북 💻 ")
     st.markdown(f"""
@@ -165,36 +164,47 @@ with st.sidebar:
     st.code("1000-4564-3898", language="text")
     st.caption("토스/카뱅 복사해서 '엔터키' 하나 사주기 ⌨️")
     
-    # 🟢 [신규 기능] 후원자 목록 (명예의 전당)
+    # 🟢 [업그레이드 기능] 후원자 목록 및 편집
     with st.expander("📜 명예의 전당 (후원자 목록)"):
-        # 1. 데이터프레임으로 목록 보여주기
+        
+        # 1. 관리자 모드 체크
+        is_admin = st.checkbox("관리자 모드 (수정/삭제)")
+        
+        # 2. 데이터프레임 생성
         if st.session_state.donors:
             df = pd.DataFrame(st.session_state.donors)
-            st.dataframe(df, use_container_width=True, hide_index=True)
         else:
-            st.write("아직 후원자가 없습니다 ㅠㅠ")
-        
-        st.markdown("---")
-        
-        # 2. 관리자 모드 (비밀번호 걸기)
-        is_admin = st.checkbox("관리자 모드 (후원자 추가)")
-        
+            df = pd.DataFrame(columns=["이름", "금액"])
+
         if is_admin:
             password = st.text_input("관리자 비밀번호", type="password")
-            if password == "1234": # 🔐 비밀번호: 1234
-                st.success("로그인 성공!")
-                new_donor_name = st.text_input("후원자 이름")
-                new_donor_amount = st.number_input("후원 금액", min_value=0, step=100)
+            if password == "1234": # 🔐 비밀번호
+                st.success("관리자 인증 성공! 표를 직접 수정하세요.")
+                st.caption("💡 팁: 클릭해서 수정, 행 선택 후 Delete 키로 삭제, 맨 아래 + 버튼으로 추가")
                 
-                if st.button("명단 추가"):
-                    if new_donor_name and new_donor_amount > 0:
-                        st.session_state.donors.append({"이름": new_donor_name, "금액": int(new_donor_amount)})
-                        st.success(f"{new_donor_name}님 추가 완료! (총액 반영됨)")
-                        st.rerun() # 화면 새로고침해서 금액 즉시 반영
-                    else:
-                        st.error("이름과 금액을 확인해주세요.")
+                # 🔥 여기서 엑셀처럼 편집 가능!
+                edited_df = st.data_editor(
+                    df, 
+                    num_rows="dynamic", # 행 추가/삭제 허용
+                    use_container_width=True,
+                    key="editor"
+                )
+                
+                # 저장 버튼
+                if st.button("변경사항 저장하기 💾"):
+                    # 편집된 데이터를 다시 세션 상태에 저장
+                    st.session_state.donors = edited_df.to_dict("records")
+                    st.rerun() # 새로고침해서 총액 반영
+            
             elif password:
                 st.error("비밀번호가 틀렸습니다.")
+            else:
+                # 비밀번호 입력 전에는 그냥 목록만 보여줌
+                st.dataframe(df, use_container_width=True, hide_index=True)
+                
+        else:
+            # 관리자가 아니면 그냥 보기만 가능
+            st.dataframe(df, use_container_width=True, hide_index=True)
 
 # 2. 메인 화면 안내 문구
 st.info("👈 **왼쪽 상단의 화살표(>)**를 눌러 정보 입력창을 열어주세요!")
