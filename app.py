@@ -274,6 +274,12 @@ with st.sidebar:
         else:
             st.dataframe(df, use_container_width=True, hide_index=True)
 
+# 🟢 [추가됨] 문의하기 섹션
+    st.markdown("---")
+    st.header("📬 문의 및 제보")
+    st.caption("재밌는 아이디어나 버그를 제보해주세요!")
+    st.markdown("📧 **이메일:** my_email@gmail.com") 
+    # (본인 이메일 주소로 수정해서 쓰세요!)
 # 2. 메인 화면 안내 문구
 st.info("👈 **왼쪽 상단의 화살표(>)**를 눌러 정보 입력창을 열어주세요!")
 
