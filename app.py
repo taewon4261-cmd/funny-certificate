@@ -4,19 +4,23 @@ import io
 import pandas as pd
 import os
 
-# 페이지 기본 설정
+# ==========================================
+# [페이지 기본 설정]
+# 🚀 핵심: initial_sidebar_state="collapsed" -> 처음엔 사이드바를 숨겨둡니다.
+# ==========================================
 st.set_page_config(
     page_title="대국민 쓸데없는 자격증 발급소",
     page_icon="🎖️",
-    layout="centered"
+    layout="centered",
+    initial_sidebar_state="collapsed" 
 )
 
 # ==========================================
 # [설정 영역]
 # ==========================================
 
-# 🅰️ 폰트 파일 설정
-FONT_PATH_MAIN = "gungseo.ttc"
+# 🅰️ 폰트 파일 설정 (전부 궁서체!)
+FONT_PATH_MAIN = "gungseo.ttc" 
 FONT_PATH_TITLE = "gungseo.ttc" 
 
 # 🅱️ 좌표 및 크기 설정
@@ -51,82 +55,64 @@ DONOR_FILE = "donors.csv"
 # ==========================================
 
 CERT_DB = {
+    "직접 입력": {"desc": "직접 입력해주세요.", "footer": "직접 입력해주세요.", "stamp_text": "내가 일짱"},
+    "집밥 미슐랭 1급": {"desc": "위 사람은 눈대중과 손맛만으로 5성급 호텔 요리를 선사하며, '맛없으면 먹지 마'라고 해도 밥 두 공기를 비우게 만들기에 임명함.", "footer": "전국 확찐자 연합회", "stamp_text": "신의 손맛"},
+    "우리집 구글 1급": {"desc": "위 사람은 '엄마 내 양말 어딨어?'라고 물으면 3초 만에 찾아내며, 집안의 모든 물건 위치를 GPS처럼 꿰뚫고 있기에 임명함.", "footer": "국제 분실물 센터", "stamp_text": "다 찾아냄"},
+    "우주 최강 엄마 1급": {"desc": "위 사람은 존재 자체만으로 우리 집의 빛과 소금이며, 자식의 투정도 태평양 같은 마음으로 받아주는 든든한 버팀목이기에 임명함.", "footer": "아들래미 팬클럽", "stamp_text": "효도 할게"},
     "협곡의 지배자 1급": {"desc": "위 사람은 '오빠 갱 안와?'를 시전하며 남 탓하기의 달인이고, 키보드 샷건 치기의 장인이기에 임명함.", "footer": "전국 키보드 워리어 협회", "stamp_text": "남탓 장인"},
     "프로 먹방러 1급": {"desc": "위 사람은 치킨 뼈를 보았을 때 양념인지 후라이드인지 구분하며, '맛있으면 0칼로리'를 과학적으로 증명했기에 임명함.", "footer": "배달의 민족 VVIP", "stamp_text": "돼지 보스"},
     "3대 500 헬창 1급": {"desc": "위 사람은 근손실을 세상에서 제일 무서워하며, 닭가슴살 쉐이크를 주식으로 삼는 쇠질 중독자이기에 임명함.", "footer": "국제 프로틴 연구소", "stamp_text": "근육 돼지"},
     "집 밖은 위험해 1급": {"desc": "위 사람은 약속이 취소되면 희열을 느끼며, 전기장판 위에서 귤 까먹는 스킬이 타의 추종을 불허하기에 임명함.", "footer": "전국 집순이 집돌이 연합", "stamp_text": "이불 밖 위험"},
     "알콜 마스터 1급": {"desc": "위 사람은 간 해독 능력이 타의 추종을 불허하며, '막차 끊겼다'를 핑계로 아침 해를 보고야 마는 인재이기에 임명함.", "footer": "국제 알콜 감별사 협회", "stamp_text": "알콜 요정"},
     "월급 로그아웃 1급": {"desc": "위 사람은 월급이 통장에 들어오자마자 0.1초 만에 카드값으로 퍼가요 당하는 마술을 보였기에 임명함.", "footer": "사이버 머니 수집가", "stamp_text": "텅장 주인"},
-"집밥 미슐랭 1급": {
-        "desc": "위 사람은 눈대중과 손맛만으로 5성급 호텔 요리를 선사하며, '맛없으면 먹지 마'라고 해도 밥 두 공기를 비우게 만들기에 임명함.",
-        "footer": "전국 확찐자 연합회",
-        "stamp_text": "신의 손맛"
-    },
-    "우리집 구글 1급": {
-        "desc": "위 사람은 '엄마 내 양말 어딨어?'라고 물으면 3초 만에 찾아내며, 집안의 모든 물건 위치를 GPS처럼 꿰뚫고 있기에 임명함.",
-        "footer": "국제 분실물 센터",
-        "stamp_text": "다 찾아냄"
-    },
-    "우주 최강 엄마 1급": {
-        "desc": "위 사람은 존재 자체만으로 우리 집의 빛과 소금이며, 자식의 투정도 태평양 같은 마음으로 받아주는 든든한 버팀목이기에 임명함.",
-        "footer": "아들래미 팬클럽",
-        "stamp_text": "효도 할게"
-    },
     "카페인 중독 1급": {"desc": "위 사람은 혈관에 피 대신 아이스 아메리카노가 흐르며, 커피 없이는 인성질을 부리는 금단현상이 있기에 임명함.", "footer": "전국 얼죽아 협회", "stamp_text": "커피 수혈"},
     "민트초코 1급": {"desc": "위 사람은 치약 맛이라고 놀림받아도 굴하지 않으며, 밥 비벼 먹을 기세로 민초를 찬양하는 굳건한 미각을 가졌기에 임명함.", "footer": "민초단 우수 회원", "stamp_text": "민초가 세상을"},
     "프로 눕방러 1급": {"desc": "위 사람은 숨쉬기 운동 외에는 일절 움직이지 않으며, 등과 바닥의 물아일체 경지에 올랐기에 임명함.", "footer": "전세계 눕방 협회장 김눕방", "stamp_text": "눕방 장인"},
     "야근 요정 1급": {"desc": "위 사람은 남들 퇴근할 때 모니터와 대화하며, 회사의 전기를 수호하였기에 임명함.", "footer": "대한민국 야근 수호대", "stamp_text": "야근 노예"},
     "아가리어터 1급": {"desc": "위 사람은 '다이어트는 내일부터'라는 명언을 매일 실천하며, 운동 등록만 하고 기부천사가 되었기에 임명함.", "footer": "전국 작심삼일 연합회", "stamp_text": "입만 살음"},
     "스마트폰 중독 1급": {"desc": "위 사람은 화장실 갈 때 폰이 없으면 변비에 걸리며, 배터리 20% 미만 시 손을 떠는 금단현상을 보였기에 임명함.", "footer": "도파민의 노예들", "stamp_text": "도파민 중독"},
-    "직접 입력": {"desc": "직접 입력해주세요.", "footer": "직접 입력해주세요.", "stamp_text": "내가 일짱"}
 }
 
-# --- 💾 [핵심 기능] CSV 파일 로드 및 저장 ---
+# --- 💾 CSV 파일 로드 및 저장 ---
 def load_donors():
-    """CSV 파일이 있으면 불러오고, 없으면 기본값 반환"""
     if os.path.exists(DONOR_FILE):
         try:
             df = pd.read_csv(DONOR_FILE)
-            # 데이터 정제: '금액' 컬럼의 NaN을 0으로 채우고 정수로 변환
             if '금액' in df.columns:
                 df['금액'] = df['금액'].fillna(0).astype(int)
             return df.to_dict('records')
         except:
             return []
     else:
-        # 파일이 없을 때 기본 데이터 (처음 시작할 때)
         return [
             {"이름": "익명의 천사", "금액": 100},
             {"이름": "지나가던 행인", "금액": 10},
         ]
 
 def save_donors(donor_list):
-    """리스트를 CSV 파일로 저장"""
     df = pd.DataFrame(donor_list)
     df.to_csv(DONOR_FILE, index=False)
 
-# 세션 상태 초기화 (앱 켜질 때 딱 한 번 실행)
 if 'donors' not in st.session_state:
     st.session_state.donors = load_donors()
 
-# 🛡️ [수정됨] 총 모금액 계산 (에러 방지 기능 추가)
+# 현재 화면 상태 관리 (HOME -> INPUT -> RESULT)
+if 'page_state' not in st.session_state:
+    st.session_state.page_state = 'HOME'
+
 def get_total_donation():
     if not st.session_state.donors:
         return 0
-    
     total = 0
     for item in st.session_state.donors:
         try:
-            # 금액을 가져오는데, 없거나 이상하면 0원으로 처리
             amount = item.get('금액', 0)
             if pd.isna(amount) or amount == '':
                 amount = 0
-            total += int(float(amount)) # float로 먼저 바꾸고 int로 (소수점 에러 방지)
+            total += int(float(amount))
         except:
-            continue # 에러나면 그냥 넘어감 (멈추지 않음)
-            
+            continue
     return total
-
 
 # --- 🛠️ 헬퍼 함수들 ---
 def wrap_text(text, font, max_width, draw):
@@ -163,28 +149,42 @@ def get_fitted_title_font(text, max_width, draw, font_path, start_size, min_size
     return ImageFont.truetype(font_path, min_size)
 
 # ==========================================
-# [메인 화면 UI 구성]
+# [화면 구성 로직]
 # ==========================================
 
-with st.sidebar:
-    st.header("📂 메뉴 선택")
-    menu = st.radio(
-        "이동할 서비스를 선택하세요:",
-        ["🏆 자격증 발급소", "🔮 심리테스트 (준비중)", "🤖 AI 캐릭터 (준비중)"]
-    )
+# 1. 🏠 시작 화면 (HOME)
+if st.session_state.page_state == 'HOME':
+    st.title("🎖️ 대국민 쓸데없는 자격증 발급소")
+    st.image("https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExcDdtY2J6eHoxMXZ6bHoxMXZ6bHoxMXZ6bHoxMXZ6bHoxMXZ6bHoxMSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3o7bu3XilJ5BOiSGic/giphy.gif", width=300)
+    st.markdown("### 당신의 잉여력을 증명하세요!")
     
-    st.markdown("---")
+    # 여기서 버튼을 누르면 -> 입력 단계로 넘어감
+    if st.button("🚀 자격증 생성하러 가기", type="primary", use_container_width=True):
+        st.session_state.page_state = 'INPUT'
+        st.rerun()
 
-    # 🟢 자격증 입력 폼
-    if menu == "🏆 자격증 발급소":
-        st.subheader("📝 자격증 정보 입력")
+    st.markdown("---")
+    st.info("👈 (개발자 메뉴는 나중에 왼쪽 사이드바를 확인하세요)")
+
+
+# 2. 📝 입력 화면 (INPUT)
+elif st.session_state.page_state == 'INPUT':
+    
+    # 메인 화면 안내 문구
+    st.title("📝 정보 입력 단계")
+    st.info("👈 **왼쪽 상단의 화살표(>)**를 눌러 사이드바를 열고 정보를 입력해주세요!")
+    st.image("https://media.giphy.com/media/l0HlO3BJ8LxrZHGxh/giphy.gif", width=200)
+
+    # --- 사이드바 구성 (입력창 열림) ---
+    with st.sidebar:
+        st.header("📝 정보 입력")
         
         user_name = st.text_input("이름", value="홍길동")
         
         cert_list = list(CERT_DB.keys())
         if "직접 입력" in cert_list:
             cert_list.remove("직접 입력")
-            cert_list.insert(0, "직접 입력")
+        cert_list.insert(0, "직접 입력")
             
         selected_cert = st.selectbox("자격증 종류", cert_list)
 
@@ -199,164 +199,166 @@ with st.sidebar:
             footer_text = CERT_DB[selected_cert]["footer"]
             stamp_text_input = CERT_DB[selected_cert]["stamp_text"]
 
-    st.markdown("---")
-    
-    # 🟢 개발자 노트북 사주기 (자동 합산 적용)
-    total_money = get_total_donation()
-    
-    st.header(" 티끌모아 노트북 💻 ")
-    st.markdown(f"""
-    코딩하다가 자꾸 렉이 걸려요... 😭  
-    여러분의 **소중한 100원**을 모아  
-    **개발용 노트북**을 장만하겠습니다!🙇‍♂️
-    
-    **(모금액: {total_money:,}원 / 1,500,000원)**
-    """)
-    st.code("1000-4564-3898", language="text")
-    st.caption("토스/카뱅 복사해서 '엔터키' 하나 사주기 ⌨️")
-    
-    # 🟢 [업그레이드 기능] 후원자 목록 및 편집
-    with st.expander("📜 명예의 전당 (후원자 목록)"):
+        st.markdown("---")
         
-        is_admin = st.checkbox("관리자 모드 (수정/삭제)")
+        # 🔥 [핵심] 사이드바 안의 "제작하기" 버튼
+        if st.button("✨ 제작하기 (완료)", type="primary", use_container_width=True):
+            # 입력값 세션에 저장
+            st.session_state.input_data = {
+                "name": user_name,
+                "title": cert_title_input,
+                "desc": cert_desc_input,
+                "footer": footer_text,
+                "stamp": stamp_text_input
+            }
+            # 결과 화면으로 이동
+            st.session_state.page_state = 'RESULT'
+            st.rerun()
+
+        # 뒤로가기 버튼
+        if st.button("🏠 홈으로"):
+            st.session_state.page_state = 'HOME'
+            st.rerun()
+
+
+# 3. 🎉 결과 화면 (RESULT)
+elif st.session_state.page_state == 'RESULT':
+    st.title("🎉 자격증 발급 완료!")
+    st.balloons() # 축하 효과
+
+    # 저장된 데이터 가져오기
+    data = st.session_state.input_data
+
+    # 이미지 생성 로직
+    try:
+        bg_image = Image.open("certificate_bg.png")
+        draw = ImageDraw.Draw(bg_image)
         
-        if st.session_state.donors:
-            df = pd.DataFrame(st.session_state.donors)
-        else:
-            df = pd.DataFrame(columns=["이름", "금액"])
-
-        if is_admin:
-            password = st.text_input("관리자 비밀번호", type="password")
-            if password == "0416": # 🔐 비밀번호
-                st.success("관리자 인증 성공! 데이터를 관리하세요.")
-                st.info("⚠️ 중요: 파일 업데이트 시 데이터가 날아갈 수 있습니다. 꼭 [명단 다운로드]를 해서 백업해두세요!")
-
-                # 편집 가능한 데이터프레임 (열 설정 추가로 에러 방지)
-                edited_df = st.data_editor(
-                    df, 
-                    num_rows="dynamic",
-                    use_container_width=True,
-                    column_config={
-                        "금액": st.column_config.NumberColumn(
-                            "금액",
-                            min_value=0,
-                            step=100,
-                            format="%d원",
-                        )
-                    },
-                    key="editor"
-                )
-                
-                # 저장 버튼
-                if st.button("변경사항 저장하기 💾"):
-                    # NaN 값 처리 후 저장
-                    edited_df['금액'] = edited_df['금액'].fillna(0)
-                    new_data = edited_df.to_dict("records")
-                    st.session_state.donors = new_data
-                    save_donors(new_data) # CSV 파일로도 저장!
-                    st.success("저장 완료! (donors.csv 업데이트됨)")
-                    st.rerun()
-
-                # 🔥 [백업용] CSV 다운로드 버튼
-                csv_data = df.to_csv(index=False).encode('utf-8-sig') # 한글 깨짐 방지
-                st.download_button(
-                    label="📂 명단 다운로드 (백업용)",
-                    data=csv_data,
-                    file_name="donors.csv",
-                    mime="text/csv"
-                )
-            
-            elif password:
-                st.error("비밀번호가 틀렸습니다.")
-            else:
-                st.dataframe(df, use_container_width=True, hide_index=True)
-                
-        else:
-            st.dataframe(df, use_container_width=True, hide_index=True)
-
-# 🟢 [추가됨] 문의하기 섹션
-    st.markdown("---")
-    st.header("📬 문의 및 제보")
-    st.caption("재밌는 아이디어나 버그를 제보해주세요!")
-    st.markdown("📧 **이메일:** mmm4261@naver.com") 
-    # (본인 이메일 주소로 수정해서 쓰세요!)
-# 2. 메인 화면 안내 문구
-st.info("👈 **왼쪽 상단의 화살표(>)**를 눌러 정보 입력창을 열어주세요!")
-
-# 3. 본문 로직
-if menu == "🏆 자격증 발급소":
-    st.title("🎖️ 대국민 쓸데없는 자격증 발급소")
-    st.caption("오늘 당신의 잉여력을 증명하세요!")
-
-    if st.button("자격증 발급하기 🖨️", type="primary"):
         try:
-            bg_image = Image.open("certificate_bg.png")
-            draw = ImageDraw.Draw(bg_image)
-            
-            # --- 폰트 로드 ---
             try:
-                try:
-                    font_header = ImageFont.truetype(FONT_PATH_TITLE, FONT_SIZE_HEADER)
-                except:
-                    font_header = ImageFont.truetype(FONT_PATH_TITLE, FONT_SIZE_HEADER, index=0)
-
-                font_desc = ImageFont.truetype(FONT_PATH_MAIN, FONT_SIZE_DESC)
-                font_footer = ImageFont.truetype(FONT_PATH_MAIN, FONT_SIZE_FOOTER)
-                font_stamp = ImageFont.truetype(FONT_PATH_MAIN, FONT_SIZE_STAMP)
+                font_header = ImageFont.truetype(FONT_PATH_TITLE, FONT_SIZE_HEADER)
             except:
-                st.error("🚨 폰트 로드 실패! 'gungseo.ttc' 또는 'font.ttf' 확인 필요.")
-                font_header = ImageFont.load_default()
-                font_desc = ImageFont.load_default()
-                font_footer = ImageFont.load_default()
-                font_stamp = ImageFont.load_default()
+                font_header = ImageFont.truetype(FONT_PATH_TITLE, FONT_SIZE_HEADER, index=0)
 
-            draw.text((HEADER_X, HEADER_Y), "자 격 증", fill=TEXT_COLOR, font=font_header, anchor="mm")
+            font_desc = ImageFont.truetype(FONT_PATH_MAIN, FONT_SIZE_DESC)
+            font_footer = ImageFont.truetype(FONT_PATH_MAIN, FONT_SIZE_FOOTER)
+            font_stamp = ImageFont.truetype(FONT_PATH_MAIN, FONT_SIZE_STAMP)
+        except:
+            st.error("🚨 폰트 로드 실패!")
+            font_header = ImageFont.load_default()
+            font_desc = ImageFont.load_default()
+            font_footer = ImageFont.load_default()
+            font_stamp = ImageFont.load_default()
 
-            full_name = f"성 명 : {user_name}"
-            fitted_name_font = get_fitted_title_font(full_name, MAX_WIDTH, draw, FONT_PATH_MAIN, FONT_SIZE_NAME)
-            draw.text((NAME_X, NAME_Y), full_name, fill=TEXT_COLOR, font=fitted_name_font)
-            
-            full_title = f"자 격 : {cert_title_input}"
-            fitted_title_font = get_fitted_title_font(full_title, MAX_WIDTH, draw, FONT_PATH_MAIN, FONT_SIZE_TITLE_DEFAULT)
-            draw.text((TITLE_X, TITLE_Y), full_title, fill=TEXT_COLOR, font=fitted_title_font)
-            
-            wrapped_desc = wrap_text(cert_desc_input, font_desc, MAX_WIDTH, draw)
-            draw.text((DESC_X, DESC_Y), wrapped_desc, fill=TEXT_COLOR, font=font_desc, spacing=15)
-            
-            draw.text((FOOTER_X, FOOTER_Y), footer_text, fill=TEXT_COLOR, font=font_footer)
+        draw.text((HEADER_X, HEADER_Y), "자 격 증", fill=TEXT_COLOR, font=font_header, anchor="mm")
 
-            try:
-                stamp_image = Image.open("stamp_frame.png").convert("RGBA")
-                stamp_draw = ImageDraw.Draw(stamp_image)
-                final_stamp_text = stamp_text_input.replace(" ", "\n")
-                
-                left, top, right, bottom = stamp_draw.multiline_textbbox((0, 0), final_stamp_text, font=font_stamp, spacing=10, align='center')
-                text_w, text_h = right - left, bottom - top
-                
-                stamp_w, stamp_h = stamp_image.size
-                text_x = (stamp_w - text_w) / 2 + STAMP_TEXT_X_OFFSET
-                text_y = (stamp_h - text_h) / 2 + STAMP_TEXT_Y_OFFSET
-                
-                stamp_draw.multiline_text((text_x, text_y), final_stamp_text, fill=STAMP_COLOR, font=font_stamp, spacing=10, align='center')
-                stamp_image = stamp_image.resize(STAMP_SIZE)
-                bg_image.paste(stamp_image, (STAMP_X, STAMP_Y), stamp_image)
-            except Exception as e:
-                st.warning(f"도장 오류: {e}")
+        full_name = f"성 명 : {data['name']}"
+        fitted_name_font = get_fitted_title_font(full_name, MAX_WIDTH, draw, FONT_PATH_MAIN, FONT_SIZE_NAME)
+        draw.text((NAME_X, NAME_Y), full_name, fill=TEXT_COLOR, font=fitted_name_font)
+        
+        full_title = f"자 격 : {data['title']}"
+        fitted_title_font = get_fitted_title_font(full_title, MAX_WIDTH, draw, FONT_PATH_MAIN, FONT_SIZE_TITLE_DEFAULT)
+        draw.text((TITLE_X, TITLE_Y), full_title, fill=TEXT_COLOR, font=fitted_title_font)
+        
+        wrapped_desc = wrap_text(data['desc'], font_desc, MAX_WIDTH, draw)
+        draw.text((DESC_X, DESC_Y), wrapped_desc, fill=TEXT_COLOR, font=font_desc, spacing=15)
+        
+        draw.text((FOOTER_X, FOOTER_Y), data['footer'], fill=TEXT_COLOR, font=font_footer)
 
-            st.image(bg_image, caption="완성된 자격증", use_container_width=True)
+        try:
+            stamp_image = Image.open("stamp_frame.png").convert("RGBA")
+            stamp_draw = ImageDraw.Draw(stamp_image)
+            final_stamp_text = data['stamp'].replace(" ", "\n")
             
+            left, top, right, bottom = stamp_draw.multiline_textbbox((0, 0), final_stamp_text, font=font_stamp, spacing=10, align='center')
+            text_w, text_h = right - left, bottom - top
+            
+            stamp_w, stamp_h = stamp_image.size
+            text_x = (stamp_w - text_w) / 2 + STAMP_TEXT_X_OFFSET
+            text_y = (stamp_h - text_h) / 2 + STAMP_TEXT_Y_OFFSET
+            
+            stamp_draw.multiline_text((text_x, text_y), final_stamp_text, fill=STAMP_COLOR, font=font_stamp, spacing=10, align='center')
+            stamp_image = stamp_image.resize(STAMP_SIZE)
+            bg_image.paste(stamp_image, (STAMP_X, STAMP_Y), stamp_image)
+        except Exception as e:
+            st.warning(f"도장 오류: {e}")
+
+        # 결과 이미지 출력
+        st.image(bg_image, caption=f"{data['name']}님의 자격증", use_container_width=True)
+        
+        # 버튼 2개 나란히 배치 (다운로드 / 새로 만들기)
+        col1, col2 = st.columns(2)
+        
+        with col1:
             buf = io.BytesIO()
             bg_image.save(buf, format="PNG")
-            st.download_button("이미지 저장 📥", buf.getvalue(), f"{user_name}_자격증.png", "image/png")
+            st.download_button(
+                label="📥 이미지 다운로드",
+                data=buf.getvalue(),
+                file_name=f"{data['name']}_자격증.png",
+                mime="image/png",
+                type="primary",
+                use_container_width=True
+            )
             
-        except Exception as e:
-            st.error(f"오류 발생: {e}")
-            st.info("파일 확인: certificate_bg.png, gungseo.ttc, font.ttf")
+        with col2:
+            if st.button("🔄 새로운 자격증 만들기", use_container_width=True):
+                st.session_state.page_state = 'INPUT' # 입력 단계로 돌아가기
+                st.rerun()
 
-elif menu == "🔮 심리테스트 (준비중)":
-    st.title("🔮 나의 숨겨진 성격 테스트")
-    st.info("이 기능은 곧 오픈됩니다! 조금만 기다려주세요.")
+    except Exception as e:
+        st.error(f"오류 발생: {e}")
 
-elif menu == "🤖 AI 캐릭터 (준비중)":
-    st.title("🤖 AI 캐릭터 만들기")
-    st.warning("개발자가 열심히 코딩 중입니다... 💦")
+
+# ==========================================
+# [공통 사이드바 요소] (입력 단계 아닐 때도 보이는 것들)
+# ==========================================
+# 결과 화면 등에서도 후원하기나 문의하기는 보이면 좋으므로 밑에 배치
+if st.session_state.page_state != 'HOME': # 홈 화면만 아니면 표시
+    with st.sidebar:
+        st.markdown("---")
+        total_money = get_total_donation()
+        
+        st.header(" 티끌모아 노트북 💻 ")
+        st.markdown(f"""
+        개발자 노트북을 위한 후원 😭  
+        **(모금액: {total_money:,}원 / 1,500,000원)**
+        """)
+        st.code("1000-4564-3898", language="text")
+        st.caption("토스/카뱅 복사해서 '엔터키' 하나 사주기 ⌨️")
+        
+        # 후원자 목록
+        with st.expander("📜 명예의 전당"):
+            is_admin = st.checkbox("관리자 모드")
+            if st.session_state.donors:
+                df = pd.DataFrame(st.session_state.donors)
+            else:
+                df = pd.DataFrame(columns=["이름", "금액"])
+
+            if is_admin:
+                password = st.text_input("관리자 비밀번호", type="password")
+                if password == "1234":
+                    edited_df = st.data_editor(
+                        df, 
+                        num_rows="dynamic",
+                        use_container_width=True,
+                        column_config={"금액": st.column_config.NumberColumn(format="%d원")},
+                        key="editor"
+                    )
+                    if st.button("저장하기 💾"):
+                        edited_df['금액'] = edited_df['금액'].fillna(0)
+                        new_data = edited_df.to_dict("records")
+                        st.session_state.donors = new_data
+                        save_donors(new_data)
+                        st.success("저장 완료!")
+                        st.rerun()
+                    
+                    csv_data = df.to_csv(index=False).encode('utf-8-sig')
+                    st.download_button("📂 명단 다운로드", csv_data, "donors.csv", "text/csv")
+                elif password:
+                    st.error("비밀번호 오류")
+            else:
+                st.dataframe(df, use_container_width=True, hide_index=True)
+
+        st.markdown("---")
+        st.caption("📧 문의/제보: mmm4261@naver.com")
