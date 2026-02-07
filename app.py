@@ -136,18 +136,21 @@ with st.sidebar:
         else:
             cert_title_input = selected_cert
             cert_desc_input = CERT_DB[selected_cert]["desc"]
-            footer_text = CERT_DB[selected_cert]["footer"]
+            footer_text = CERT_DB[selected_cert]["footㅇer"]
             stamp_text_input = CERT_DB[selected_cert]["stamp_text"]
 
+    # 🟢 [수정됨] 현실적인 노트북 구매 메타
     st.markdown("---")
-    st.header("💻 티끌모아 노트북 사기...")
-    st.markdown("여러분의 **소중한 100원**을 모아  
+    st.header(" 티끌모아 노트북 💻 ")
+    st.markdown("""
+    코딩하다가 자꾸 렉이 걸려요... 😭  
+    여러분의 **소중한 100원**을 모아  
     **개발용 노트북**을 장만하겠습니다!🙇‍♂️
-
-**(모금액: 0원 / 1,500,000원)**
-    """")
+    
+    **(모금액: 0원 / 1,500,000원)**
+    """)
     st.code("1000-4564-3898", language="text")
-    st.caption("토스/카뱅 복사용")
+    st.caption("토스/카뱅 복사해서 '엔터키' 하나 사주기 ⌨️")
 
 # 2. 메인 화면 안내 문구
 st.info("👈 **왼쪽 상단의 화살표(>)**를 눌러 정보 입력창을 열어주세요!")
