@@ -57,7 +57,7 @@ CERT_DB = {
     "협곡의 지배자 1급": {"desc": "위 사람은 '오빠 갱 안와?'를 시전하며 남 탓하기의 달인이고, 키보드 샷건 치기의 장인이기에 임명함.", "footer": "전국 키보드 워리어 협회", "stamp_text": "남탓 장인"},
     "프로 먹방러 1급": {"desc": "위 사람은 치킨 뼈를 보았을 때 양념인지 후라이드인지 구분하며, '맛있으면 0칼로리'를 과학적으로 증명했기에 임명함.", "footer": "배달의 민족 VVIP", "stamp_text": "돼지 보스"},
     "3대 500 헬창 1급": {"desc": "위 사람은 근손실을 세상에서 제일 무서워하며, 닭가슴살 쉐이크를 주식으로 삼는 쇠질 중독자이기에 임명함.", "footer": "국제 프로틴 연구소", "stamp_text": "근육 돼지"},
-    "집 밖은 위험해 1급": {"desc": "위 사람은 약속이 취소되면 희열을 느끼며, 전기장판 위에서 귤 까먹는 스킬이 타의 추종을 불허하기에 임명함.", "footer": "전국 집순이 집돌이 연합", "stamp_text": "이불 밖 위험"},
+    "집 밖은 위험해 1급": {"desc": "위 사람은 약속이 취소되면 희열을 느끼며, 전기장판 위에서 귤 까먹는 스킬이 타의 추종을 불허하기기에 임명함.", "footer": "전국 집순이 집돌이 연합", "stamp_text": "이불 밖 위험"},
     "알콜 마스터 1급": {"desc": "위 사람은 간 해독 능력이 타의 추종을 불허하며, '막차 끊겼다'를 핑계로 아침 해를 보고야 마는 인재이기에 임명함.", "footer": "국제 알콜 감별사 협회", "stamp_text": "알콜 요정"},
     "월급 로그아웃 1급": {"desc": "위 사람은 월급이 통장에 들어오자마자 0.1초 만에 카드값으로 퍼가요 당하는 마술을 보였기에 임명함.", "footer": "사이버 머니 수집가", "stamp_text": "텅장 주인"},
     "카페인 중독 1급": {"desc": "위 사람은 혈관에 피 대신 아이스 아메리카노가 흐르며, 커피 없이는 인성질을 부리는 금단현상이 있기에 임명함.", "footer": "전국 얼죽아 협회", "stamp_text": "커피 수혈"},
@@ -160,7 +160,7 @@ if 'page_state' not in st.session_state:
 # 1. 🏠 시작 화면 (HOME) - 사이드바 닫힘
 if st.session_state.page_state == 'HOME':
     st.title("🎖️ 대국민 쓸데없는 자격증 발급소")
-    st.image("https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExcDdtY2J6eHoxMXZ6bHoxMXZ6bHoxMXZ6bHoxMXZ6bHoxMXZ6bHoxMSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3o7bu3XilJ5BOiSGic/giphy.gif", width=300)
+    # 🔥 [수정됨] 로딩 이미지(GIF) 제거 완료!
     st.markdown("### 당신의 잉여력을 증명하세요!")
     
     st.markdown("---")
