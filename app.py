@@ -16,10 +16,20 @@ st.set_page_config(
 )
 
 # [SEO 및 사이트 소유 확인 직접 설정]
-# 네이버나 구글 서치콘솔에서 발급받은 <meta ... /> 태그를 아래 따옴표 안에 붙여넣으세요.
 st.markdown("""
+<!-- 네이버/구글 소유 확인 -->
 <meta name="naver-site-verification" content="b8c1e47b59963da338d13156f6e09dc653522af6" />
 <meta name="google-site-verification" content="EqmIqtAk3RUCATueXn5fH7tRPkfRouvKJCiYFrnBuf8" />
+
+<!-- 사이트 설명 및 키워드 -->
+<meta name="description" content="세상에 하나뿐인 나만의 쓸데없는 자격증과 상장을 무료로 만들어보세요! 상장 제조기 온라인 발급소입니다." />
+<meta name="keywords" content="상장제조기, 자격증만들기, 온라인상장, 재미있는선물, 수료증제작" />
+
+<!-- Open Graph (SNS 공유 시 노출되는 정보) -->
+<meta property="og:title" content="🎖️ 상장 제조기 - 나만의 자격증 만들기" />
+<meta property="og:description" content="클릭 몇 번으로 쉽고 재미있게 상장을 제작하고 다운로드하세요." />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://funny-license.streamlit.app" />
 """, unsafe_allow_html=True)
 
 # ==========================================
