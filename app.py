@@ -314,29 +314,30 @@ elif st.session_state.page_state == 'RESULT':
 # [공통 사이드바 요소]
 # 입력 화면(INPUT)일 때만 밑에 후원/문의 탭을 보여줍니다.
 # ==========================================
-if st.session_state.page_state == 'INPUT':
-    with st.sidebar:
-        st.markdown("---")
-        st.header("🛒 개발자 응원하기")
-        st.markdown("""
-        이 사이트가 도움이 되셨나요?  
-        아래 배너를 통해 쿠팡에서 필요한 물건을 구매해 주시면,  
-        개발자에게 소정의 후원금이 전달됩니다! (추가 비용 없음) 😊
-        """)
+with st.sidebar:
+    st.markdown("---")
+    st.header("")
+    st.markdown("""
+    """)
 
-        # 쿠팡 파트너스 배너 (실제 사용자 코드 적용)
-        ads_html = """
-        <script src="https://ads-partners.coupang.com/g.js"></script>
-        <script>
-            new PartnersCoupang.G({"id":970603,"template":"carousel","trackingCode":"AF7635994","width":"680","height":"140","tsource":""});
-        </script>
-        <style>
-            iframe { width: 100% !important; border-radius: 8px; border: none; }
-        </style>
-        """
-        st.components.v1.html(ads_html, height=160)
-        
-        st.caption("링크를 통해 사이트를 방문하시면 수익이 발생합니다.")
+    # 1. 텍스트 링크 (배너보다 먼저 배치하여 확실히 보이게 함)
+    st.markdown("### [👉 쿠팡 홈 바로가기 (클릭)](https://link.coupang.com/a/dZVMb8)")
+    
+    st.markdown("---")
 
-        st.markdown("---")
-        st.caption("📧 문의/제보: mmm4261@naver.com")
+    # 2. 쿠팡 파트너스 다이나믹 배너
+    ads_html = """
+    <script src="https://ads-partners.coupang.com/g.js"></script>
+    <script>
+        new PartnersCoupang.G({"id":970603,"template":"carousel","trackingCode":"AF7635994","width":"680","height":"140","tsource":""});
+    </script>
+    <style>
+        iframe { width: 100% !important; border-radius: 8px; border: none; }
+    </style>
+    """
+    st.components.v1.html(ads_html, height=160)
+    
+    st.caption("링크나 배너를 통해 방문하시면 수익이 발생합니다. ❤️")
+
+    st.markdown("---")
+    st.caption("📧 문의/제보: mmm4261@naver.com")
