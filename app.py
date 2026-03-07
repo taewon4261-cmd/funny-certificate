@@ -9,11 +9,17 @@ import os
 # 🚀 초기 상태: 사이드바 닫힘 (collapsed)
 # ==========================================
 st.set_page_config(
-    page_title="대국민 쓸데없는 자격증 발급소",
+    page_title="🎖️ 상장 제조기 - 대국민 쓸데없는 자격증 온라인 발급소",
     page_icon="🎖️",
     layout="centered",
     initial_sidebar_state="collapsed" 
 )
+
+# [SEO 및 사이트 소유 확인 직접 설정]
+# 네이버나 구글 서치콘솔에서 발급받은 <meta ... /> 태그를 아래 따옴표 안에 붙여넣으세요.
+st.markdown("""
+<meta name="naver-site-verification" content="b8c1e47b59963da338d13156f6e09dc653522af6" />
+""", unsafe_allow_html=True)
 
 # ==========================================
 # [설정 영역]
