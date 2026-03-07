@@ -317,55 +317,26 @@ elif st.session_state.page_state == 'RESULT':
 if st.session_state.page_state == 'INPUT':
     with st.sidebar:
         st.markdown("---")
-        total_money = get_total_donation()
-        
-        st.header(" 티끌모아 노트북 💻 ")
-        st.markdown(f"""
-         코딩하다가 자꾸 렉이 걸려요... 😭  
-
-    여러분의 **소중한 100원**을 모아  
-
-    **개발용 노트북**을 장만하겠습니다!🙇‍♂️
-        **(모금액: {total_money:,}원 / 1,500,000원)**
+        st.header("🛒 개발자 응원하기")
+        st.markdown("""
+        이 사이트가 도움이 되셨나요?  
+        아래 배너를 통해 쿠팡에서 필요한 물건을 구매해 주시면,  
+        개발자에게 소정의 후원금이 전달됩니다! (추가 비용 없음) 😊
         """)
-        st.code("1000-4564-3898", language="text")
-        st.caption("토스/카뱅 복사해서 '엔터키' 하나 사주기 ⌨️")
-        
-        # 후원자 목록
-        with st.expander("📜 명예의 전당"):
-            is_admin = st.checkbox("관리자 모드")
-            if st.session_state.donors:
-                df = pd.DataFrame(st.session_state.donors)
-            else:
-                df = pd.DataFrame(columns=["이름", "금액"])
 
-            if is_admin:
-                password = st.text_input("관리자 비밀번호", type="password")
-                if password == "1234":
-                    edited_df = st.data_editor(
-                        df, 
-                        num_rows="dynamic",
-                        use_container_width=True,
-                        column_config={"금액": st.column_config.NumberColumn(format="%d원")},
-                        key="editor"
-                    )
-                    if st.button("저장하기 💾"):
-                        # 여기서도 안전장치 추가
-                        if '금액' in edited_df.columns:
-                            edited_df['금액'] = pd.to_numeric(edited_df['금액'], errors='coerce').fillna(0).astype(int)
-                            
-                        new_data = edited_df.to_dict("records")
-                        st.session_state.donors = new_data
-                        save_donors(new_data)
-                        st.success("저장 완료!")
-                        st.rerun()
-                    
-                    csv_data = df.to_csv(index=False).encode('utf-8-sig')
-                    st.download_button("📂 명단 다운로드", csv_data, "donors.csv", "text/csv")
-                elif password:
-                    st.error("비밀번호 오류")
-            else:
-                st.dataframe(df, use_container_width=True, hide_index=True)
+        # 쿠팡 파트너스 배너 (실제 사용자 코드 적용)
+        ads_html = """
+        <script src="https://ads-partners.coupang.com/g.js"></script>
+        <script>
+            new PartnersCoupang.G({"id":970603,"template":"carousel","trackingCode":"AF7635994","width":"680","height":"140","tsource":""});
+        </script>
+        <style>
+            iframe { width: 100% !important; border-radius: 8px; border: none; }
+        </style>
+        """
+        st.components.v1.html(ads_html, height=160)
+        
+        st.caption("링크를 통해 사이트를 방문하시면 수익이 발생합니다.")
 
         st.markdown("---")
         st.caption("📧 문의/제보: mmm4261@naver.com")
