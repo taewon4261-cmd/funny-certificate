@@ -340,7 +340,7 @@ with st.sidebar:
     """)
 
     # 1. 텍스트 링크 (배너보다 먼저 배치)
-    st.markdown("### [👉 내 선물 고르러 가기 (클릭)](https://link.coupang.com/a/dZVMb8)")
+    st.markdown("### [👉 선물 고르러 가기 (클릭)](https://link.coupang.com/a/dZVMb8)")
     
     st.markdown("---")
 
