@@ -9,7 +9,7 @@ import os
 # 🚀 초기 상태: 사이드바 닫힘 (collapsed)
 # ==========================================
 st.set_page_config(
-    page_title="EqmIqtAk3RUCATueXn5fH7tRPkfRouvKJCiYFrnBuf8 | b8c1e47b59963da338d13156f6e09dc653522af6 | 상장 제조기",
+    page_title="🎖️ 상장 제조기 - 온라인 자격증 발급소 (b8c1e47 | EqmIqtAk)",
     page_icon="🎖️",
     layout="centered",
     initial_sidebar_state="collapsed" 
