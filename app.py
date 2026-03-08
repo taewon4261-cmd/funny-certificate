@@ -9,7 +9,7 @@ import os
 # [페이지 기본 설정]
 # ==========================================
 st.set_page_config(
-    page_title=" 상장 제조기 - 온라인 자격증 발급소",
+    page_title=" 상장 제조기 - 대국민 쓸데없는 자격증 온라인 발급소",
     page_icon="🎖️",
     layout="centered",
     initial_sidebar_state="collapsed" 
@@ -360,7 +360,7 @@ with st.sidebar:
         iframe { width: 100% !important; border-radius: 8px; border: none; }
     </style>
     """
-    st.components.v1.html(ads_html, height=160)
+    components.html(ads_html, height=160)
     
     st.caption("링크나 배너를 통해 방문하시면 수익이 발생합니다. ❤️")
 
