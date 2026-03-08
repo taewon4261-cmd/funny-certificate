@@ -7,52 +7,36 @@ import os
 
 # ==========================================
 # [페이지 기본 설정]
-# 🚀 초기 상태: 사이드바 닫힘 (collapsed)
 # ==========================================
 st.set_page_config(
-    page_title="🎖️ 상장 제조기 - 온라인 자격증 발급소 (b8c1e47 | EqmIqtAk)",
+    page_title="🎖️ 상장 제조기 - 온라인 자격증 발급소",
     page_icon="🎖️",
     layout="centered",
     initial_sidebar_state="collapsed" 
 )
 
-# [SEO 및 사이트 소유 확인 강제 적용 - Head 섹션 주입]
-# 스트림릿의 특성상 본문에 있는 태그를 헤드로 강제 이동시켜 인증 성공률을 높입니다.
-components.html(
-    f"""
-    <script>
-        var head = window.parent.document.head;
-        
-        // 1. 네이버 소유 확인 메타 태그
-        var naverTag = window.parent.document.createElement('meta');
-        naverTag.name = "naver-site-verification";
-        naverTag.content = "b8c1e47b59963da338d13156f6e09dc653522af6";
-        head.appendChild(naverTag);
-        
-        // 2. 구글 소유 확인 메타 태그
-        var googleTag = window.parent.document.createElement('meta');
-        googleTag.name = "google-site-verification";
-        googleTag.content = "EqmIqtAk3RUCATueXn5fH7tRPkfRouvKJCiYFrnBuf8";
-        head.appendChild(googleTag);
-
-        // 3. 구글 애널리틱스(GA4) 추적 코드
-        var gaScript = window.parent.document.createElement('script');
-        gaScript.async = true;
-        gaScript.src = 'https://www.googletagmanager.com/gtag/js?id=G-M9W2N8WJ7Y';
-        head.appendChild(gaScript);
-
-        var gaConfig = window.parent.document.createElement('script');
-        gaConfig.innerHTML = `
-            window.parent.dataLayer = window.parent.dataLayer || [];
-            function gtag(){{window.parent.dataLayer.push(arguments);}}
-            gtag('js', new Date());
-            gtag('config', 'G-M9W2N8WJ7Y');
-        `;
-        head.appendChild(gaConfig);
-    </script>
-    """,
-    height=0,
-)
+# [SEO 및 사이트 소유 확인 직접 설정]
+# 주의: 스트림릿 특성상 <head>가 아닌 <body>에 삽입되지만, 
+# 구글/네이버 로봇이 최근에는 <body>에 있는 태그도 잘 읽어갑니다.
+st.markdown(f"""
+    <!-- 네이버 소유 확인 -->
+    <meta name="naver-site-verification" content="b8c1e47b59963da338d13156f6e09dc653522af6" />
+    <!-- 구글 소유 확인 -->
+    <meta name="google-site-verification" content="EqmIqtAk3RUCATueXn5fH7tRPkfRouvKJCiYFrnBuf8" />
+    
+    <!-- 사이트 설명 -->
+    <meta name="description" content="나만의 쓸데없는 자격증과 상장을 1분 만에 무료로 제작해보세요! (상장번호 포함)" />
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="🎖️ 상장 제조기 - 나만의 자격증 만들기" />
+    <meta property="og:description" content="쉽고 재미있는 상장 제작 서비스" />
+    
+    <!-- 구글 인증용 텍스트 노출 (최후의 수단: 로봇이 본문 텍스트로도 읽음) -->
+    <div style="display:none;">
+        naver-site-verification: b8c1e47b59963da338d13156f6e09dc653522af6
+        google-site-verification: EqmIqtAk3RUCATueXn5fH7tRPkfRouvKJCiYFrnBuf8
+    </div>
+""", unsafe_allow_html=True)
 
 # ==========================================
 # [설정 영역]
